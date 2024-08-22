@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2">
+  <file datatype="php" source-language="en" target-language="en">
+    <body>
+      <trans-unit id="MSC.damDownloadFailed">
+        <source>The download did not work, check the system logs or contact the system administrator.</source>
+        <target>The download did not work, check the system logs or contact the system administrator.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

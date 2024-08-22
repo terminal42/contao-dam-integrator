@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2">
+  <file datatype="php" source-language="en" target-language="de">
+    <body>
+      <trans-unit id="tl_user_group.dam_enable.0">
+        <source>Restrict DAM integrations</source>
+        <target>DAM-Integrationen einschränken</target>
+      </trans-unit>
+      <trans-unit id="tl_user_group.dam_enable.1">
+        <source>Restricts permissions to the given DAM integrations for this user group.</source>
+        <target>Schränkt den Zugriff auf die ausgewählten DAM-Integrationen für diese Benutzergruppe ein.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

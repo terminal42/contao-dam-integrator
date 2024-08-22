@@ -1,0 +1,12 @@
+{
+  "entrypoints": {
+    "app": {
+      "css": [
+        "/bundles/terminal42contaodamintegrator/app.43c4f5c1.css"
+      ],
+      "js": [
+        "/bundles/terminal42contaodamintegrator/app.e920e50c.js"
+      ]
+    }
+  }
+}
