@@ -55,6 +55,10 @@ class BynderIntegration extends AbstractIntegration
             'page' => $filter->page,
         ];
 
+        if ($filter->keywords) {
+            $query['keyword'] = $filter->keywords;
+        }
+
         if (!$filter->filters->empty()) {
             $propertyOptionIds = [];
 
