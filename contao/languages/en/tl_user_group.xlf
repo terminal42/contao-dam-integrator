@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2">
   <file datatype="php" source-language="en" target-language="en">
     <body>
       <trans-unit id="tl_user_group.dam_enable.0">
-        <source>Restrict DAM integrations</source>
-        <target>Restrict DAM integrations</target>
+        <source>Enable DAM integrations</source>
+        <target>Enable DAM integrations</target>
       </trans-unit>
       <trans-unit id="tl_user_group.dam_enable.1">
-        <source>Restricts permissions to the given DAM integrations for this user group.</source>
-        <target>Restricts permissions to the given DAM integrations for this user group.</target>
+        <source>Allows access to the given DAM integrations for this user group.</source>
+        <target>Allows access to the given DAM integrations for this user group.</target>
       </trans-unit>
     </body>
   </file>

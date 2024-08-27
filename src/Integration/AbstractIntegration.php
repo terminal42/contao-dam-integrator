@@ -62,7 +62,7 @@ abstract class AbstractIntegration implements IntegrationInterface, ServiceSubsc
         }
 
         // Otherwise it must have been explicitly enabled in the settings
-        return \in_array(static::getKey(), explode(',', (string) $user->dam_enable), true);
+        return \in_array(static::getKey(), $user->dam_enable, true);
     }
 
     protected function getUser(): UserInterface|null

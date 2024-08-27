@@ -3,12 +3,12 @@
   <file datatype="php" source-language="en" target-language="de">
     <body>
       <trans-unit id="tl_user_group.dam_enable.0">
-        <source>Restrict DAM integrations</source>
-        <target>DAM-Integrationen einschränken</target>
+        <source>Enable DAM integrations</source>
+        <target>DAM-Integrationen erlauben</target>
       </trans-unit>
       <trans-unit id="tl_user_group.dam_enable.1">
-        <source>Restricts permissions to the given DAM integrations for this user group.</source>
-        <target>Schränkt den Zugriff auf die ausgewählten DAM-Integrationen für diese Benutzergruppe ein.</target>
+        <source>Allows access to the given DAM integrations for this user group.</source>
+        <target>Ermöglicht den Zugriff auf die ausgewählten DAM-Integrationen für diese Benutzergruppe.</target>
       </trans-unit>
     </body>
   </file>
