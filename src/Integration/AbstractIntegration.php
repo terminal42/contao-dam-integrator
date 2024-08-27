@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Terminal42\ContaoDamIntegrator\Integration;
 
-use Contao\BackendUser;
 use Contao\CoreBundle\Filesystem\VirtualFilesystemInterface;
 use Contao\CoreBundle\Picker\PickerConfig;
 use Contao\StringUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceMethodsSubscriberTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Terminal42\ContaoDamIntegrator\Security\Permissions;
 
 abstract class AbstractIntegration implements IntegrationInterface, ServiceSubscriberInterface
 {
@@ -50,24 +49,7 @@ abstract class AbstractIntegration implements IntegrationInterface, ServiceSubsc
 
     protected function isIntegrationEnabled(): bool
     {
-        $user = $this->getUser();
-
-        if (!$user instanceof BackendUser) {
-            return false;
-        }
-
-        // Admins are always allowed
-        if ($user->isAdmin) {
-            return true;
-        }
-
-        // Otherwise it must have been explicitly enabled in the settings
-        return \in_array(static::getKey(), $user->dam_enable, true);
-    }
-
-    protected function getUser(): UserInterface|null
-    {
-        return $this->security()->getUser();
+        return $this->security()->isGranted(Permissions::USER_CAN_ACCESS_INTEGRATION, static::getKey());
     }
 
     protected function getTargetPath(string $name, string $targetDir, bool $replaceExisting, string|null $extension = null): string
