@@ -64,7 +64,7 @@ abstract class AbstractPickerProvider implements PickerProviderInterface
      */
     public function supportsContext(string $context): bool
     {
-        return 'file' === $context && !\in_array($this->getIntegration()::getKey(), (array) $this->getUser()->dam_disable, true);
+        return $this->getIntegration()->supportsPicker(new PickerConfig($context));
     }
 
     /**

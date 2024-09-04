@@ -16,6 +16,6 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['dam_enable'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_user_group']['dam_enable'],
     'exclude' => true,
     'inputType' => 'checkbox',
-    'eval' => ['multiple' => true, 'csv' => ','],
+    'eval' => ['multiple' => true],
     'sql' => ['type' => 'text', 'notnull' => false],
 ];
