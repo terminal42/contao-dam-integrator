@@ -83,10 +83,14 @@ class BynderIntegration extends AbstractIntegration
 
         foreach ($media['media'] as $assetData) {
             $asset = new Asset($assetData['id'], $assetData['idHash'], $assetData['name']);
-            $asset->fileSize = (int) $assetData['fileSize'];
-            $asset->width = (int) $assetData['width'];
-            $asset->height = (int) $assetData['height'];
-            $asset->thumbnail = new Thumbnail($assetData['thumbnails']['mini'], $assetData['name']);
+            $asset->fileSize = $assetData['fileSize'] ?? 0;
+            $asset->width = $assetData['width'] ?? 0;
+            $asset->height = $assetData['height'] ?? 0;
+            $asset->extension = $assetData['extension'][0] ?? null;
+
+            if (isset($assetData['thumbnails']['mini'])) {
+                $asset->thumbnail = new Thumbnail($assetData['thumbnails']['mini'], $assetData['name']);
+            }
 
             $assets->addAsset($asset);
         }

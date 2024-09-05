@@ -14,6 +14,8 @@ class Asset
 
     public int|null $fileSize = null;
 
+    public string|null $extension = null;
+
     public Thumbnail|null $thumbnail = null;
 
     public function __construct(
@@ -24,7 +26,7 @@ class Asset
     }
 
     /**
-     * @return array{identifier: string, hash: string, name: string, width: ?int, height: ?int, fileSize: ?int, meta: string, thumb: array{url: string, alt: string}|null}
+     * @return array{identifier: string, hash: string, name: string, width: ?int, height: ?int, fileSize: ?int, extension: ?string, meta: string, thumb: array{url: string, alt: string}|null}
      */
     public function toArray(): array
     {
@@ -35,6 +37,7 @@ class Asset
             'width' => $this->width,
             'height' => $this->height,
             'fileSize' => $this->fileSize,
+            'extension' => $this->extension,
             'meta' => $this->formatMeta(),
             'thumb' => $this->thumbnail?->toArray(),
         ];
@@ -43,18 +46,22 @@ class Asset
     public function formatMeta(): string
     {
         $meta = [];
-        if (null !== $this->fileSize) {
+        if (null !== $this->fileSize && $this->fileSize > 0) {
             $meta['size'] = (new ByteFormatter())->format($this->fileSize);
         }
 
-        if (null !== $this->width && null !== $this->height) {
+        if (null !== $this->extension) {
+            $meta[] = $this->extension;
+        }
+
+        if (null !== $this->width && null !== $this->height && $this->height > 0 && $this->width > 0) {
             $meta[] = \sprintf(
-                '(%sx%s px)',
+                '%s x %s px',
                 $this->width,
                 $this->height,
             );
         }
 
-        return implode(' ', $meta);
+        return implode('; ', $meta);
     }
 }
