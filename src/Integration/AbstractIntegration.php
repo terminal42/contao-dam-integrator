@@ -86,19 +86,19 @@ abstract class AbstractIntegration implements IntegrationInterface, ServiceSubsc
     }
 
     #[SubscribedService]
-    private function logger(): LoggerInterface
+    protected function logger(): LoggerInterface
     {
         return $this->container->get(__FUNCTION__);
     }
 
     #[SubscribedService]
-    private function virtualFilesystem(): VirtualFilesystemInterface
+    protected function virtualFilesystem(): VirtualFilesystemInterface
     {
         return $this->container->get(__FUNCTION__);
     }
 
     #[SubscribedService]
-    private function security(): Security
+    protected function security(): Security
     {
         return $this->container->get(__FUNCTION__);
     }

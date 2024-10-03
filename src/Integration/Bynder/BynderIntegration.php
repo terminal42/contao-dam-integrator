@@ -150,17 +150,18 @@ class BynderIntegration extends AbstractIntegration
                 return DownloadResult::failed($identifier);
             }
 
-            if (!isset($media['thumbnails'][$this->derivativeName])) {
-                $this->logError(\sprintf('Could not import the derivative "%s" for media ID "%s" because the derivative does not exist.',
+            if (isset($media['thumbnails'][$this->derivativeName])) {
+                $fileUrl = $media['thumbnails'][$this->derivativeName];
+            } else {
+                $this->logger()->debug(\sprintf('Could not import the derivative "%s" for media ID "%s" because the derivative does not exist. Falling back to original.',
                     $this->derivativeName,
                     $identifier,
                 ));
-
-                return DownloadResult::failed($identifier);
+                $fileUrl = $media['original'];
             }
 
             /** @var StreamableInterface $response */
-            $response = $this->httpClient->request('GET', $media['thumbnails'][$this->derivativeName]);
+            $response = $this->httpClient->request('GET', $fileUrl);
             $stream = $response->toStream();
         } catch (ExceptionInterface $e) {
             $this->logError(\sprintf('Could not import the derivative "%s" for media ID "%s": %s.',
