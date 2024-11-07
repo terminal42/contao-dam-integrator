@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Terminal42\ContaoDamIntegrator;
 
+use Contao\CoreBundle\Filesystem\ExtraMetadata;
 use Contao\CoreBundle\Filesystem\FilesystemItem;
 use Contao\CoreBundle\Filesystem\VirtualFilesystemInterface;
 use Psr\Log\LoggerInterface;
@@ -94,7 +95,7 @@ class AssetHandler
             throw new \InvalidArgumentException('Asset not found.');
         }
 
-        $assetMetadata = $item->getExtraMetadata()[AssetMetadata::VIRTUAL_FILESYSTEM_META_KEY] ?? null;
+        $assetMetadata = $item->getExtraMetadata()->get(AssetMetadata::VIRTUAL_FILESYSTEM_META_KEY);
 
         if ($assetMetadata instanceof AssetMetadata) {
             return [$item, $assetMetadata];
@@ -105,9 +106,9 @@ class AssetHandler
 
     private function triggerMetadataUpdate(string $path, AssetMetadata $assetMetadata): void
     {
-        $this->virtualFilesystem->setExtraMetadata($path, [
+        $this->virtualFilesystem->setExtraMetadata($path, new ExtraMetadata([
             AssetMetadata::VIRTUAL_FILESYSTEM_META_KEY => $assetMetadata,
-        ]);
+        ]));
     }
 
     private function getIntegration(string $integration): IntegrationInterface

@@ -24,15 +24,13 @@ class DbafsMetadataEventListener
         }
 
         $meta = $event->getExtraMetadata();
+        $metadata = $meta->get(AssetMetadata::VIRTUAL_FILESYSTEM_META_KEY);
 
-        if (!isset($meta[AssetMetadata::VIRTUAL_FILESYSTEM_META_KEY])) {
+        if (!$metadata instanceof AssetMetadata) {
             return;
         }
 
-        /** @var AssetMetadata $metadata */
-        $metadata = $meta[AssetMetadata::VIRTUAL_FILESYSTEM_META_KEY];
-
-        if (!$metadata instanceof AssetMetadata || !$this->integrationCollection->has($metadata->integration)) {
+        if (!$this->integrationCollection->has($metadata->integration)) {
             return;
         }
 
