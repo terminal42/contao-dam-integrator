@@ -6,6 +6,7 @@ namespace Terminal42\ContaoDamIntegrator\Integration\Bynder;
 
 use Contao\CoreBundle\Filesystem\Dbafs\StoreDbafsMetadataEvent;
 use Contao\CoreBundle\Picker\PickerConfig;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpClient\Response\StreamableInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -152,12 +153,14 @@ class BynderIntegration extends AbstractIntegration
 
             if (isset($media['thumbnails'][$this->derivativeName])) {
                 $fileUrl = $media['thumbnails'][$this->derivativeName];
+                $extension = Path::getExtension($fileUrl); // Thumbnails can e.g. also be jpegs when the original is a tif
             } else {
                 $this->logger()->debug(\sprintf('Could not import the derivative "%s" for media ID "%s" because the derivative does not exist. Falling back to original.',
                     $this->derivativeName,
                     $identifier,
                 ));
                 $fileUrl = $media['original'];
+                $extension = $media['extension'][0] ?? null;
             }
 
             /** @var StreamableInterface $response */
@@ -173,7 +176,7 @@ class BynderIntegration extends AbstractIntegration
             return DownloadResult::failed($identifier);
         }
 
-        $path = $this->getTargetPath($media['name'], $this->targetDir, $replaceExisting, $media['extension'][0] ?? null);
+        $path = $this->getTargetPath($media['name'], $this->targetDir, $replaceExisting, $extension);
 
         return DownloadResult::successful($identifier, $media['idHash'], $stream, $path);
     }
