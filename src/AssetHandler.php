@@ -74,8 +74,8 @@ class AssetHandler
 
         if (\is_string($head) && \is_array($tmp = @getimagesizefromstring($head))) {
             $assetMetadata = $assetMetadata
-                ->withWidth($tmp[0])
-                ->withHeight($tmp[1])
+                ->withWidth((int) $tmp[0])
+                ->withHeight((int) $tmp[1])
             ;
         }
 
