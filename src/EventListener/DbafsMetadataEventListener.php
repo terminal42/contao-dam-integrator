@@ -76,11 +76,11 @@ class DbafsMetadataEventListener
         }
 
         if ($event->getRow()['dam_asset_width'] ?? null) {
-            $assetMetadata = $assetMetadata->withWidth($event->getRow()['dam_asset_width']);
+            $assetMetadata = $assetMetadata->withWidth((int) $event->getRow()['dam_asset_width']);
         }
 
         if ($event->getRow()['dam_asset_height'] ?? null) {
-            $assetMetadata = $assetMetadata->withHeight($event->getRow()['dam_asset_height']);
+            $assetMetadata = $assetMetadata->withHeight((int) $event->getRow()['dam_asset_height']);
         }
 
         $event->set(AssetMetadata::VIRTUAL_FILESYSTEM_META_KEY, $assetMetadata);
