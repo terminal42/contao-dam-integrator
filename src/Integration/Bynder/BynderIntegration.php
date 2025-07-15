@@ -114,6 +114,9 @@ class BynderIntegration extends AbstractIntegration
             ],
         )->toArray();
 
+        // Sort by z-index
+        uasort($metaProperties, static fn (array $a, array $b) => $a['zindex'] <=> $b['zindex']);
+
         foreach ($metaProperties as $propertyName => $metaProperty) {
             // Currently, only single selects are supported.
             if (!isset($metaProperty['type']) || !\in_array($metaProperty['type'], ['select', 'select2'], true)) {
