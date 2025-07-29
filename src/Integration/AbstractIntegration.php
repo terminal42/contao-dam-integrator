@@ -77,7 +77,7 @@ abstract class AbstractIntegration implements IntegrationInterface, ServiceSubsc
         // Check if already exists and increase index until we have a valid file name (if enabled
         $index = 1;
 
-        while ($replaceExisting && $this->virtualFilesystem()->fileExists($path)) {
+        while (!$replaceExisting && $this->virtualFilesystem()->fileExists($path)) {
             $path = $subfolder.$name.'_'.$index.'.'.$extension;
             ++$index;
         }
