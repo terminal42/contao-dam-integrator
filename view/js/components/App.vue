@@ -8,7 +8,7 @@
                 @reset="resetFilter"
                 @paginationUpdated="paginationUpdated">
         </filter-panel>
-        <div class="tl_listing_container tree_view tl_file_manager" id="tl_listing">
+        <div class="tl_listing_container tree_view tl_file_manager" id="tl_listing" :data-picker-value="fieldType === 'checkbox' ? JSON.stringify(preSelected) : ''">
             <div v-if="loading" class="loader">{{ labels.loadingData }}</div>
             <div v-else-if="!hasAssets()">{{ labels.noResult }}</div>
             <ul v-else class="tl_listing picker unselectable" id="tl_select">
