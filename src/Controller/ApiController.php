@@ -25,7 +25,7 @@ use Terminal42\ContaoDamIntegrator\Integration\Dto\FilterOption;
 use Terminal42\ContaoDamIntegrator\Integration\IntegrationInterface;
 use Terminal42\ContaoDamIntegrator\IntegrationCollection;
 
-#[Route(path: '/_dam_api/{integration}/', defaults: ['_scope' => 'backend'])]
+#[Route(path: '/_dam_api/{integration}/', defaults: ['_scope' => 'backend', '_store_referrer' => false])]
 class ApiController
 {
     public function __construct(
