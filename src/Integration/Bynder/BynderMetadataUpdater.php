@@ -20,6 +20,7 @@ class BynderMetadataUpdater extends AbstractMetadataUpdater
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly array $metaConfig,
+        private readonly bool $syncImportantPart,
     ) {
     }
 
@@ -73,6 +74,10 @@ class BynderMetadataUpdater extends AbstractMetadataUpdater
      */
     private function importImportantPath(AssetMetadata $assetMetadata, StoreDbafsMetadataEvent $event, array $media): void
     {
+        if (!$this->syncImportantPart) {
+            return;
+        }
+
         if (
             null === $assetMetadata->getWidth()
             || null === $assetMetadata->getHeight()

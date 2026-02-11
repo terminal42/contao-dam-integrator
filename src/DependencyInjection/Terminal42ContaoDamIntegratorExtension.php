@@ -71,6 +71,7 @@ class Terminal42ContaoDamIntegratorExtension extends Extension
                 (new Definition(BynderMetadataUpdater::class))
                     ->setArgument('$httpClient', $client)
                     ->setArgument('$metaConfig', $config['metadata']['mapper'])
+                    ->setArgument('$syncImportantPart', $config['metadata']['sync_important_part'])
                     ->setAutoconfigured(true),
             );
         }
