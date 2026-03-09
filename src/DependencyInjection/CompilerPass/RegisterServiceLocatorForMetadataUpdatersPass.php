@@ -17,6 +17,7 @@ class RegisterServiceLocatorForMetadataUpdatersPass implements CompilerPassInter
         $locateableServices = [
             'logger' => new Reference('logger'),
             'twig' => new Reference('twig'),
+            'database_connection' => new Reference('database_connection'),
         ];
 
         foreach (array_keys($container->findTaggedServiceIds(AbstractMetadataUpdater::CONTAINER_TAG_NAME)) as $serviceId) {

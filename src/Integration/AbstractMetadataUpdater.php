@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Terminal42\ContaoDamIntegrator\Integration;
 
 use Contao\CoreBundle\Filesystem\Dbafs\StoreDbafsMetadataEvent;
+use Contao\CoreBundle\Util\LocaleUtil;
+use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceMethodsSubscriberTrait;
@@ -36,13 +38,24 @@ abstract class AbstractMetadataUpdater implements ServiceSubscriberInterface
         }
 
         $meta = [];
+        $relevantLocales = $this->getRelevantLocales();
+        $contextCache = [];
 
-        foreach ($metaConfig as $language => $languageConfig) {
+        foreach ($relevantLocales as $locale) {
+            $languageConfig = $this->resolveMetaConfigForLocale($locale, $metaConfig);
+
+            if ([] === $languageConfig) {
+                continue;
+            }
+
+            $contextCache[$locale] ??= $fetchContextForLanguage($locale);
+
             foreach ($languageConfig as $field => $valueTemplate) {
                 $template = $this->twig()->createTemplate($valueTemplate);
-                $meta[$language][$field] = $this->twig()->render(
+
+                $meta[$locale][$field] = $this->twig()->render(
                     $template,
-                    $fetchContextForLanguage($language),
+                    $contextCache[$locale],
                 );
             }
         }
@@ -57,15 +70,56 @@ abstract class AbstractMetadataUpdater implements ServiceSubscriberInterface
         }
     }
 
+    /**
+     * Resolution order:
+     *  1. exact locale match, e.g. "de_CH"
+     *  2. family match, e.g. "de+"
+     *
+     * Examples:
+     *  - locale "de" => "de" first, then "de+"
+     *  - locale "de_CH" => "de_CH" first, then "de+"
+     */
+    private function resolveMetaConfigForLocale(string $locale, array $metaConfig): array
+    {
+        if (isset($metaConfig[$locale]) && \is_array($metaConfig[$locale])) {
+            return $metaConfig[$locale];
+        }
+
+        $primaryLanguage = LocaleUtil::getPrimaryLanguage($locale);
+        $familyKey = $primaryLanguage.'+';
+
+        if (isset($metaConfig[$familyKey]) && \is_array($metaConfig[$familyKey])) {
+            return $metaConfig[$familyKey];
+        }
+
+        return [];
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function getRelevantLocales(): array
+    {
+        $locales = $this->connection()->fetchFirstColumn("SELECT DISTINCT language FROM tl_page WHERE type='root' AND language!=''");
+
+        return array_unique(array_merge($locales, array_map(LocaleUtil::getPrimaryLanguage(...), $locales)));
+    }
+
     #[SubscribedService]
     private function logger(): LoggerInterface
     {
-        return $this->container->get(__FUNCTION__);
+        return $this->container->get('logger');
     }
 
     #[SubscribedService]
     private function twig(): Environment
     {
-        return $this->container->get(__FUNCTION__);
+        return $this->container->get('twig');
+    }
+
+    #[SubscribedService]
+    private function connection(): Connection
+    {
+        return $this->container->get('database_connection');
     }
 }
