@@ -140,7 +140,7 @@ class Terminal42ContaoDamIntegratorExtension extends Extension
     private function buildHttpClient(array $options, bool $retryable = true): Definition
     {
         $client = (new Definition(HttpClient::class))
-            ->setFactory(HttpClient::create(...))
+            ->setFactory([HttpClient::class, 'create'])
             ->setArgument(0, $options)
         ;
 
