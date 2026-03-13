@@ -37,6 +37,20 @@ settings are described here:
   you to combine multiple fields or use Twig functions for advanced use cases. Note that because we are within the Symfony
   config, if you are using `{% if ... %}` statements, you need to escape the `%` in order to make sure Symfony is not
   looking for parameters. So write `{%% if ... %%}` instead.
+  Locale keys normally match **exactly** (e.g. `de` only applies to the `de` locale). If you want a mapping to apply to a
+  language and all of its regional variants, you can suffix the locale with `+`. For example, `de+` will match `de`,
+  `de_CH`, `de_DE`, etc.
+
+  ```yaml
+  metadata:
+      mapper:
+          de+:
+              title: '{{ name }}'
+              alt: "{{ tags|join(', ') }}"
+  ```
+
+  Exact locale mappings still take precedence over the `+` variant. So `de_CH` would override `de+` if both are defined.
+
 * `metadata.cronjob.expression`: By default, cronjobs are disabled but if you want to have this extension to regularly update the
   metadata of your assets, you may configure the expression here. For example, if you wanted to update the metadata of all
   files every Monday, use e.g.:
