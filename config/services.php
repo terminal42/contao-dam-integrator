@@ -15,6 +15,7 @@ use Terminal42\ContaoDamIntegrator\IntegrationCollection;
 use Terminal42\ContaoDamIntegrator\Messenger\MessageHandler\UpdateMetadataMessageHandler;
 use Terminal42\ContaoDamIntegrator\Picker\AbstractPickerProvider;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -56,6 +57,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             service('translator'),
             service('router'),
             service(IntegrationCollection::class),
+            param('kernel.debug'),
         ])
         ->public()
     ;

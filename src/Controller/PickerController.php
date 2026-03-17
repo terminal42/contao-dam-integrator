@@ -6,6 +6,7 @@ namespace Terminal42\ContaoDamIntegrator\Controller;
 
 use Contao\Backend;
 use Contao\BackendTemplate;
+use Contao\BackendUser;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Picker\PickerBuilderInterface;
@@ -37,6 +38,7 @@ class PickerController
         private readonly TranslatorInterface $translator,
         private readonly RouterInterface $router,
         private readonly IntegrationCollection $integrationCollection,
+        private readonly bool $isDebug,
     ) {
     }
 
@@ -75,11 +77,17 @@ class PickerController
             $template->pickerMenu = $this->menuRenderer->render($picker->getMenu());
         }
 
+        $renderMainOnly  = $request->query->has('popup') || 'contao-main' === $request->headers->get('turbo-frame');
+
         $template->attributes = ' data-dam-asset-picker="'.$integration::getKey().'"';
         $template->main = $this->getInitHtml($picker, $integration);
         $template->title = StringUtil::specialchars($integration->getPickerLabel());
         $template->headline = StringUtil::specialchars($integration->getPickerLabel());
         $template->isPopup = true;
+        $template->isDebug = $this->isDebug;
+        $template->backendWidth = BackendUser::getInstance()->backendWidth;
+        $template->host = Backend::getDecodedHostname();
+        $template->renderMainOnly = $renderMainOnly;
         $template->theme = Backend::getTheme();
         $template->base = Environment::get('base');
         $template->language = $GLOBALS['TL_LANGUAGE'];
