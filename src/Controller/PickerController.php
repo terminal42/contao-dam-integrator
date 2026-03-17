@@ -26,6 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\ContaoDamIntegrator\Integration\IntegrationInterface;
 use Terminal42\ContaoDamIntegrator\IntegrationCollection;
+use Twig\Environment as TwigEnvironment;
 
 #[Route(defaults: ['_scope' => 'backend'])]
 class PickerController
@@ -38,6 +39,7 @@ class PickerController
         private readonly TranslatorInterface $translator,
         private readonly RouterInterface $router,
         private readonly IntegrationCollection $integrationCollection,
+        private readonly TwigEnvironment $twig,
         private readonly bool $isDebug,
     ) {
     }
@@ -102,42 +104,29 @@ class PickerController
     {
         $config = $picker->getConfig();
 
-        $fieldType = $config->getExtra('fieldType');
-        $preSelected = json_encode(explode(',', $config->getValue()));
-
-        $labels = json_encode((object) [
-            'reset' => $this->translator->trans('MSC.reset', [], 'contao_default'),
-            'apply' => $this->translator->trans('MSC.apply', [], 'contao_default'),
-            'filter' => $this->translator->trans('MSC.filter', [], 'contao_default'),
-            'search' => $this->translator->trans('MSC.search', [], 'contao_default'),
-            'keywords' => $this->translator->trans('MSC.keywords', [], 'contao_default'),
-            'loadingData' => $this->translator->trans('MSC.loadingData', [], 'contao_default'),
-            'noResult' => $this->translator->trans('MSC.noResult', [], 'contao_default'),
-            'showOnly' => $this->translator->trans('MSC.showOnly', [], 'contao_default'),
-            'downloadFailed' => $this->translator->trans('MSC.damDownloadFailed', [], 'contao_default'),
-            'pickerLabel' => $integration->getPickerLabel(),
+        return $this->twig->render('@Contao/backend/dam_picker.html.twig', [
+            'js_config' => [
+                'fieldType' => $config->getExtra('fieldType'),
+                'pickerConfig' => $config->urlEncode(),
+                'preSelected' => explode(',', $config->getValue()),
+                'api' => [
+                    'filters' => $this->router->generate('dam_integrator_api_filters', ['integration' => $integration::getKey()], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'assets' => $this->router->generate('dam_integrator_api_assets', ['integration' => $integration::getKey()], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'download' => $this->router->generate('dam_integrator_api_download', ['integration' => $integration::getKey()], UrlGeneratorInterface::ABSOLUTE_URL),
+                ],
+                'labels' => [
+                    'reset' => $this->translator->trans('MSC.reset', [], 'contao_default'),
+                    'apply' => $this->translator->trans('MSC.apply', [], 'contao_default'),
+                    'filter' => $this->translator->trans('MSC.filter', [], 'contao_default'),
+                    'search' => $this->translator->trans('MSC.search', [], 'contao_default'),
+                    'keywords' => $this->translator->trans('MSC.keywords', [], 'contao_default'),
+                    'loadingData' => $this->translator->trans('MSC.loadingData', [], 'contao_default'),
+                    'noResult' => $this->translator->trans('MSC.noResult', [], 'contao_default'),
+                    'showOnly' => $this->translator->trans('MSC.showOnly', [], 'contao_default'),
+                    'downloadFailed' => $this->translator->trans('MSC.damDownloadFailed', [], 'contao_default'),
+                    'pickerLabel' => $integration->getPickerLabel(),
+                ],
+            ],
         ]);
-
-        $filtersApi = $this->router->generate('dam_integrator_api_filters', ['integration' => $integration::getKey()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $assetsApi = $this->router->generate('dam_integrator_api_assets', ['integration' => $integration::getKey()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $downloadApi = $this->router->generate('dam_integrator_api_download', ['integration' => $integration::getKey()], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        return <<<VIEW
-            <div class="tl_tree_radio"></div>
-            <div id="dam_interface"></div>
-            <script>
-            window.initDamInterface('#dam_interface', {
-                fieldType: '$fieldType',
-                labels: $labels,
-                preSelected: $preSelected,
-                pickerConfig: '{$config->urlEncode()}',
-                api: {
-                    filters: '$filtersApi',
-                    assets: '$assetsApi',
-                    download: '$downloadApi'
-                }
-            });
-            </script>
-            VIEW;
     }
 }

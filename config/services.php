@@ -57,6 +57,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             service('translator'),
             service('router'),
             service(IntegrationCollection::class),
+            service('twig'),
             param('kernel.debug'),
         ])
         ->public()
