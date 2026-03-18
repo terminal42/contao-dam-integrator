@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Terminal42\ContaoDamIntegrator\Picker;
 
-use Contao\BackendUser;
 use Contao\CoreBundle\Picker\PickerConfig;
 use Contao\CoreBundle\Picker\PickerProviderInterface;
 use Contao\Validator;
@@ -12,7 +11,6 @@ use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Terminal42\ContaoDamIntegrator\Integration\IntegrationInterface;
 
 abstract class AbstractPickerProvider implements PickerProviderInterface
@@ -20,7 +18,6 @@ abstract class AbstractPickerProvider implements PickerProviderInterface
     public function __construct(
         private readonly FactoryInterface $menuFactory,
         private readonly RouterInterface $router,
-        private readonly TokenStorageInterface $tokenStorage,
         private readonly Packages $packages,
     ) {
     }
@@ -103,27 +100,5 @@ abstract class AbstractPickerProvider implements PickerProviderInterface
         );
 
         return $this->router->generate('dam_asset_picker', $params);
-    }
-
-    /**
-     * Returns the back end user object.
-     *
-     * @throws \RuntimeException
-     */
-    private function getUser(): BackendUser
-    {
-        $token = $this->tokenStorage->getToken();
-
-        if (null === $token) {
-            throw new \RuntimeException('No token provided');
-        }
-
-        $user = $token->getUser();
-
-        if (!$user instanceof BackendUser) {
-            throw new \RuntimeException('The token does not contain a back end user object');
-        }
-
-        return $user;
     }
 }

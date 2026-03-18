@@ -79,7 +79,7 @@ class PickerController
             $template->pickerMenu = $this->menuRenderer->render($picker->getMenu());
         }
 
-        $renderMainOnly  = $request->query->has('popup') || 'contao-main' === $request->headers->get('turbo-frame');
+        $renderMainOnly = $request->query->has('popup') || 'contao-main' === $request->headers->get('turbo-frame');
 
         $template->attributes = ' data-dam-asset-picker="'.$integration::getKey().'"';
         $template->main = $this->getInitHtml($picker, $integration);
