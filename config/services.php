@@ -39,7 +39,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             service('knp_menu.factory'),
             service('router'),
-            service('security.token_storage'),
             service('assets.packages'),
         ])
         ->autoconfigure(false)
