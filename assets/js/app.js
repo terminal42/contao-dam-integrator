@@ -1,5 +1,5 @@
 import { Application, Controller } from '@hotwired/stimulus';
-import { createApp } from 'vue'
+import { createApp } from 'vue';
 import App from './components/App.vue';
 import '../css/styles.scss';
 
@@ -10,12 +10,12 @@ application.register(
     class extends Controller {
         connect() {
             this.app = createApp(App, JSON.parse(this.element.dataset.config));
-            this.app.mount(this.element)
+            this.app.mount(this.element);
         }
 
         disconnect() {
             if (this.app) {
-                this.app.unmount()
+                this.app.unmount();
             }
         }
     },

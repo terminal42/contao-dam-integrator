@@ -12,23 +12,23 @@
 </template>
 
 <script>
-    export default {
-        props: {
-            name: {
-                type: String,
-                required: true,
-            },
-            value: {
-                type: String,
-            },
-            checked: {
-                type: Boolean,
-            },
+export default {
+    props: {
+        name: {
+            type: String,
+            required: true,
         },
-        methods: {
-            toggle(value) {
-                this.$emit('checked', value);
-            },
+        value: {
+            type: String,
         },
-    };
+        checked: {
+            type: Boolean,
+        },
+    },
+    methods: {
+        toggle(value) {
+            this.$emit('checked', value);
+        },
+    },
+};
 </script>

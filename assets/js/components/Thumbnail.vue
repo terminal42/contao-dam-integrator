@@ -24,12 +24,12 @@
 </template>
 
 <script>
-    export default {
-        props: {
-          asset: {
-                type: Object,
-                required: true,
-            },
+export default {
+    props: {
+        asset: {
+            type: Object,
+            required: true,
         },
-    };
+    },
+};
 </script>

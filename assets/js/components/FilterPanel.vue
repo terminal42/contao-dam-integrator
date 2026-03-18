@@ -40,116 +40,112 @@
 </template>
 
 <script>
-    import debounce from 'lodash.debounce';
-    import PaginationDropDown from './PaginationDropDown.vue';
+import debounce from 'lodash.debounce';
+import PaginationDropDown from './PaginationDropDown.vue';
 
-    export default {
-        props: {
-          filterDefinition: {
-                type: Array,
-                required: true,
-            },
-            labels: {
-                type: Object,
-                required: true,
-            },
-            pagination: {
-                type: Object,
-                required: true,
-            },
+export default {
+    props: {
+        filterDefinition: {
+            type: Array,
+            required: true,
+        },
+        labels: {
+            type: Object,
+            required: true,
+        },
+        pagination: {
+            type: Object,
+            required: true,
+        },
+    },
+
+    components: { PaginationDropDown },
+
+    data() {
+        return {
+            filterData: {},
+            keywords: '',
+        };
+    },
+
+    computed: {
+        filters() {
+            let filters = {};
+
+            this.filterDefinition.forEach((filterDef) => {
+                filters[filterDef.propertyName] = {
+                    label: filterDef.label,
+                    options: [{ value: '', label: '-' }, ...filterDef.options],
+                };
+
+                // Set default selected option
+                this.filterData[filterDef.propertyName] = '';
+            });
+
+            return filters;
         },
 
-        components: { PaginationDropDown },
+        resetFiltersActive() {
+            return this.isAtLeastOneFilterOrKeywordsActive();
+        },
+    },
 
-        data() {
-            return {
-                filterData: {},
-                keywords: '',
-            }
+    methods: {
+        hasFilters() {
+            return Object.keys(this.filters).length !== 0;
         },
 
-        computed: {
-            filters() {
-                let filters = {};
+        applyFiltersDebounced: debounce(function () {
+            this.applyFilters();
+        }, 500),
 
-                this.filterDefinition.forEach((filterDef) => {
-                   filters[filterDef.propertyName] = {
-                       label: filterDef.label,
-                       options: [
-                           { value: '', label: '-' },
-                           ...filterDef.options,
-                       ],
-                   };
-
-                   // Set default selected option
-                   this.filterData[filterDef.propertyName] = '';
-                });
-
-                return filters;
-            },
-
-            resetFiltersActive() {
-                return this.isAtLeastOneFilterOrKeywordsActive();
-            }
-        },
-
-        methods: {
-
-            hasFilters() {
-                return Object.keys(this.filters).length !== 0;
-            },
-
-            applyFiltersDebounced: debounce(function() {
-                this.applyFilters();
-            }, 500),
-
-            applyFilters() {
-                this.$forceUpdate();
-                if (this.isAtLeastOneFilterOrKeywordsActive()) {
-                    this.$emit('apply', this.filterData, this.keywords);
-                } else {
-                    this.$emit('reset');
-                }
-            },
-
-            isFilterActive(property) {
-                return  '' !== this.filterData[property];
-            },
-
-            isAtLeastOneFilterOrKeywordsActive() {
-                let hasFilters = false;
-
-                Object.keys(this.filters).forEach((property) => {
-                    if (!hasFilters && this.isFilterActive(property)) {
-                        hasFilters = true;
-                    }
-                });
-
-                return '' !== this.keywords || hasFilters;
-            },
-
-            resetFilters() {
-                Object.keys(this.filters).forEach((property) => {
-                    // Set default selected option
-                    this.filterData[property] = '';
-                });
-                this.keywords = '';
-
-                // Refresh the Choices.js – as silly as it is, but there is no way to access the Choices instance
-                this.$refs.filterPanel.querySelectorAll('select').forEach(el => {
-                    const item = el.parentElement.querySelector('.choices__item');
-
-                    if (item) {
-                        item.textContent = '-';
-                    }
-                });
-
+        applyFilters() {
+            this.$forceUpdate();
+            if (this.isAtLeastOneFilterOrKeywordsActive()) {
+                this.$emit('apply', this.filterData, this.keywords);
+            } else {
                 this.$emit('reset');
-            },
-
-            updatePagination(page) {
-                this.$emit('paginationUpdated', page);
             }
         },
-    };
+
+        isFilterActive(property) {
+            return '' !== this.filterData[property];
+        },
+
+        isAtLeastOneFilterOrKeywordsActive() {
+            let hasFilters = false;
+
+            Object.keys(this.filters).forEach((property) => {
+                if (!hasFilters && this.isFilterActive(property)) {
+                    hasFilters = true;
+                }
+            });
+
+            return '' !== this.keywords || hasFilters;
+        },
+
+        resetFilters() {
+            Object.keys(this.filters).forEach((property) => {
+                // Set default selected option
+                this.filterData[property] = '';
+            });
+            this.keywords = '';
+
+            // Refresh the Choices.js – as silly as it is, but there is no way to access the Choices instance
+            this.$refs.filterPanel.querySelectorAll('select').forEach((el) => {
+                const item = el.parentElement.querySelector('.choices__item');
+
+                if (item) {
+                    item.textContent = '-';
+                }
+            });
+
+            this.$emit('reset');
+        },
+
+        updatePagination(page) {
+            this.$emit('paginationUpdated', page);
+        },
+    },
+};
 </script>

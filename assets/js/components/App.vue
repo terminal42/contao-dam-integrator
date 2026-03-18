@@ -38,149 +38,150 @@
 </template>
 
 <script>
-    import FilterPanel from './FilterPanel.vue';
-    import AssetRow from './AssetRow.vue';
+import AssetRow from './AssetRow.vue';
+import FilterPanel from './FilterPanel.vue';
 
-    export default {
-        props: {
-            fieldType: {
-                type: String,
-                required: true,
-            },
-            labels: {
-                type: Object,
-                required: true,
-            },
-            preSelected: {
-                type: Array,
-                required: true,
-            },
-            pickerConfig: {
-                type: String,
-                required: true,
-            },
-            api: {
-              type: Object,
-              required: true,
-            },
+export default {
+    props: {
+        fieldType: {
+            type: String,
+            required: true,
         },
-
-        components: { FilterPanel, AssetRow },
-
-        data() {
-            return {
-                filterDefinition: [],
-                pagination: {},
-                assets: [],
-                loading: false,
-                lastQueryString: '',
-                assetsQuery: {
-                    filters: {},
-                    keywords: '',
-                }
-            }
+        labels: {
+            type: Object,
+            required: true,
         },
+        preSelected: {
+            type: Array,
+            required: true,
+        },
+        pickerConfig: {
+            type: String,
+            required: true,
+        },
+        api: {
+            type: Object,
+            required: true,
+        },
+    },
 
-        created() {
-          fetch(this.api.filters + '?picker=' + this.pickerConfig)
-              .then((response) => {
+    components: { FilterPanel, AssetRow },
+
+    data() {
+        return {
+            filterDefinition: [],
+            pagination: {},
+            assets: [],
+            loading: false,
+            lastQueryString: '',
+            assetsQuery: {
+                filters: {},
+                keywords: '',
+            },
+        };
+    },
+
+    created() {
+        fetch(this.api.filters + '?picker=' + this.pickerConfig)
+            .then((response) => {
                 return response.json();
-              })
-              .then((data) => {
+            })
+            .then((data) => {
                 this.filterDefinition = data;
-              })
+            });
+
+        this.updateAssets();
+    },
+
+    methods: {
+        hasAssets() {
+            return this.assets.length !== 0;
+        },
+
+        applyFilter(filters, keywords) {
+            this.assetsQuery.filters = filters;
+            this.assetsQuery.keywords = keywords;
+            this.pagination.currentPage = 1;
 
             this.updateAssets();
         },
 
-        methods: {
+        resetFilter() {
+            this.assetsQuery.filters = {};
+            this.assetsQuery.keywords = '';
+            this.pagination.currentPage = 1;
 
-            hasAssets() {
-                return this.assets.length !== 0;
-            },
+            this.updateAssets();
+        },
 
-            applyFilter(filters, keywords) {
-               this.assetsQuery.filters = filters;
-                this.assetsQuery.keywords = keywords;
+        updateAssets() {
+            if (this.loading) {
+                return;
+            }
+
+            if (undefined === this.pagination.currentPage) {
                 this.pagination.currentPage = 1;
+            }
 
-                this.updateAssets();
-            },
+            let queryString = {
+                preSelected: this.preSelected.join(','),
+                page: this.pagination.currentPage,
+                picker: this.pickerConfig,
+            };
+            let filters = {};
 
-            resetFilter() {
-                this.assetsQuery.filters = {};
-                this.assetsQuery.keywords = '';
-                this.pagination.currentPage = 1;
+            if ('' !== this.assetsQuery.keywords) {
+                queryString['keyword'] = this.assetsQuery.keywords;
+            }
 
-                this.updateAssets();
-            },
+            Object.keys(this.assetsQuery.filters).forEach((property) => {
+                let filterValue = this.assetsQuery.filters[property];
 
-            updateAssets() {
-                if (this.loading) {
-                    return;
+                if ('' !== filterValue) {
+                    filters[property] = filterValue;
                 }
+            });
 
-                if (undefined === this.pagination.currentPage) {
-                    this.pagination.currentPage = 1;
-                }
+            if (Object.keys(filters).length) {
+                queryString['filters'] = JSON.stringify(filters);
+            }
 
-                let queryString =  {
-                    preSelected: this.preSelected.join(','),
-                    page: this.pagination.currentPage,
-                    picker: this.pickerConfig
-                };
-                let filters = {};
+            queryString = this.buildQueryString(queryString);
 
-                if ('' !== this.assetsQuery.keywords) {
-                    queryString['keyword'] = this.assetsQuery.keywords;
-                }
+            if (this.lastQueryString === queryString) {
+                return;
+            }
 
-                Object.keys(this.assetsQuery.filters).forEach((property) => {
-                    let filterValue = this.assetsQuery.filters[property];
+            this.loading = true;
+            this.lastQueryString = queryString;
 
-                    if ('' !== filterValue) {
-                        filters[property] = filterValue;
-                    }
-                });
+            let uri = this.api.assets + ('' !== queryString ? '?' + queryString : '');
 
-                if (Object.keys(filters).length) {
-                    queryString['filters'] = JSON.stringify(filters);
-                }
-
-                queryString = this.buildQueryString(queryString);
-
-                if (this.lastQueryString === queryString) {
-                    return;
-                }
-
-                this.loading = true;
-                this.lastQueryString = queryString;
-
-                let uri = this.api.assets + (('' !== queryString) ? ('?' + queryString) : '');
-
-              fetch(uri)
-                  .then((response) => {
+            fetch(uri)
+                .then((response) => {
                     return response.json();
-                  })
-                  .then((data) => {
+                })
+                .then((data) => {
                     this.assets = data.assets;
                     this.pagination = data.pagination;
                     this.loading = false;
-                  })
-                  .catch(() => {
+                })
+                .catch(() => {
                     this.loading = false;
                 });
-            },
+        },
 
-            paginationUpdated() {
-                this.updateAssets();
-            },
+        paginationUpdated() {
+            this.updateAssets();
+        },
 
-            buildQueryString(data) {
-                return Object.keys(data).map(function(key) {
+        buildQueryString(data) {
+            return Object.keys(data)
+                .map(function (key) {
                     return [key, data[key]].map(encodeURIComponent).join('=');
-                }).join('&');
-            }
-        }
-    }
+                })
+                .join('&');
+        },
+    },
+};
 </script>

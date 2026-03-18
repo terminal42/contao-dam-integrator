@@ -11,48 +11,46 @@
 
 
 <script>
-    export default {
-        props: {
-            data: {
-                type: Object,
-                required: true,
-            },
-            labels: {
-                type: Object,
-                required: true,
-            },
+export default {
+    props: {
+        data: {
+            type: Object,
+            required: true,
+        },
+        labels: {
+            type: Object,
+            required: true,
+        },
+    },
+
+    methods: {
+        apply() {
+            this.$emit('apply');
         },
 
-        methods: {
-
-            apply() {
-                this.$emit('apply');
-            },
-
-            getOptions() {
-                let options = [];
-                for (let i = 0; i < this.data.totalPages; i++) {
-                    options.push({
-                        value: i + 1,
-                        label: this.getFrom(i) + ' - ' + this.getTo(i)
-                    });
-                }
-
-                return options;
-            },
-
-            getFrom(i) {
-                if (0 === i) {
-                    return 1;
-                }
-
-                return i * this.data.perPage;
-            },
-
-            getTo(i) {
-                i++;
-                return Math.min(i * this.data.perPage, this.data.totalImages);
+        getOptions() {
+            let options = [];
+            for (let i = 0; i < this.data.totalPages; i++) {
+                options.push({
+                    value: i + 1,
+                    label: this.getFrom(i) + ' - ' + this.getTo(i),
+                });
             }
-        }
-    }
+
+            return options;
+        },
+
+        getFrom(i) {
+            if (0 === i) {
+                return 1;
+            }
+
+            return i * this.data.perPage;
+        },
+
+        getTo(i) {
+            return Math.min((i + 1) * this.data.perPage, this.data.totalImages);
+        },
+    },
+};
 </script>
