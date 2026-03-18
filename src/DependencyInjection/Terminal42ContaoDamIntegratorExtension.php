@@ -25,6 +25,9 @@ use Terminal42\ContaoDamIntegrator\Integration\IntegrationInterface;
 
 class Terminal42ContaoDamIntegratorExtension extends Extension
 {
+    /**
+     * @param array<array<string, mixed>> $configs
+     */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
@@ -140,7 +143,7 @@ class Terminal42ContaoDamIntegratorExtension extends Extension
     private function buildHttpClient(array $options, bool $retryable = true): Definition
     {
         $client = (new Definition(HttpClient::class))
-            ->setFactory(HttpClient::create(...))
+            ->setFactory([HttpClient::class, 'create'])
             ->setArgument(0, $options)
         ;
 
