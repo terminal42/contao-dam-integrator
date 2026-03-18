@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use Terminal42\ContaoDamIntegrator\Integration\Celum\CelumIntegration;
 use Terminal42\ContaoDamIntegrator\Picker\AbstractPickerProvider;
 use Terminal42\ContaoDamIntegrator\Picker\Celum\CelumPickerProvider;
-
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
