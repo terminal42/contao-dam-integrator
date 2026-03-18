@@ -1,9 +1,11 @@
 <template>
     <div class="tl_limit tl_subpanel">
-        <strong>{{ labels.showOnly }}:</strong>
-        <select v-model="data.currentPage" name="tl_limit" :class="{'tl_select': true, 'active': data.currentPage !== 1 }" @change="apply()">
-            <option v-for="option in getOptions()" :value="option.value">{{ option.label }}</option>
-        </select>
+        <label for="tl_limit">{{ labels.showOnly }}</label>
+        <div class="tl_select_wrapper" data-controller="contao--choices">
+            <select v-model="data.currentPage" name="tl_limit" id="tl_limit" class="tl_select" :class="{'active': data.currentPage !== 1 }" @change="apply()">
+                <option v-for="option in getOptions()" :value="option.value">{{ option.label }}</option>
+            </select>
+        </div>
     </div>
 </template>
 

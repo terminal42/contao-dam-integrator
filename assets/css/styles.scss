@@ -27,20 +27,17 @@ body[data-dam-asset-picker="celum"] .tl_folder_top .tl_left {
 
 #dam-asset-mgmt .download-button {
   .button {
-    color: #fff;
-    background-color: #0af;
-    display: inline-block;
-    padding: 4px 20px 6px 20px;
-    font-size: 14px;
-    line-height: 1.5;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: middle;
+    margin-right: -3px;
     cursor: pointer;
-  }/*
-  .ld-ring:after {
-    box-sizing: border-box;
-  }*/
+
+    &[disabled] {
+      cursor: wait;
+    }
+  }
+
+  input:disabled {
+    display: none;
+  }
 }
 
 #dam-asset-mgmt {

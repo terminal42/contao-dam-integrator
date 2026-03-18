@@ -1,28 +1,40 @@
 <template>
     <div>
-        <div class="tl_panel cf">
-            <div class="tl_search tl_subpanel">
-                <strong>{{ labels.search }}:</strong>
-                <select name="tl_field" :class="{ tl_select: true, active: keywords !== '' }">
-                    <option value="keywords">{{ labels.keywords }}</option>
-                </select>
-                <span>=</span>
-                <input type="search" name="tl_value" :class="{ tl_text: true, active: keywords !== '' }" v-model="keywords" @keyup="applyFiltersDebounced()">
+        <button type="button" class="close" aria-controls="tl_content_filter" data-action="contao--toggle-receiver#close" data-contao--tooltips-target="tooltip" :title="labels.toggleFilterHide">×</button>
+        <div class="tl_formbody" ref="filterPanel">
+            <div class="tl_panel">
+                <fieldset class="tl_search tl_subpanel">
+                    <legend>{{ labels.search }}</legend>
+                    <label for="tl_search">{{ labels.field }}</label>
+                    <div class="tl_select_wrapper" data-controller="contao--choices">
+                        <select name="tl_field" id="tl_search" class="tl_select" :class="{ active: keywords !== '' }">
+                            <option value="keywords">{{ labels.keywords }}</option>
+                        </select>
+                    </div>
+                    <label for="tl_search_term">{{ labels.keyword }}</label>
+                    <input type="search" name="tl_value" id="tl_search_term" class="tl_text" :class="{ active: keywords !== '' }" v-model="keywords" @keyup="applyFiltersDebounced()">
+                </fieldset>
+            </div>
+            <div v-if="hasFilters()" class="tl_panel">
+                <fieldset class="tl_filter tl_subpanel">
+                    <legend>{{ labels.filter }}</legend>
+
+                    <template v-for="(filter, property) in filters">
+                        <label :for="`tl_filter_${property}`">{{ filter.label }}</label>
+                        <div class="tl_select_wrapper" data-controller="contao--choices">
+                            <select v-model="filterData[property]" :name="property" :id="`tl_filter_${property}`" class="tl_select" :class="{ active: isFilterActive(property)}" @change="applyFilters()">
+                                <option v-for="option in filter.options" :value="option.value">{{ option.label }}</option>
+                            </select>
+                        </div>
+                    </template>
+                </fieldset>
+            </div>
+            <div class="tl_panel">
+                <pagination-drop-down :data="pagination" :labels="labels" @apply="updatePagination"></pagination-drop-down>
             </div>
         </div>
-        <div v-if="hasFilters()" class="tl_panel cf">
-            <div class="tl_filter tl_subpanel">
-                <strong>{{ labels.filter }}:</strong>
-                <select v-model="filterData[property]" v-for="(options, property) in filters" :name="property" :class="{ tl_select: true, active: isFilterActive(property)}" @change="applyFilters()">
-                    <option v-for="option in options" :value="option.value">{{ option.label }}</option>
-                </select>
-            </div>
-        </div>
-        <div class="tl_panel cf">
-            <div class="tl_submit_panel tl_subpanel" style="min-width:0">
-                <button name="filter_reset" id="filter_reset" value="1" class="tl_img_submit filter_reset" title="" @click="resetFilters">{{ labels.reset }}</button>
-            </div>
-            <pagination-drop-down :data="pagination" :labels="labels" @apply="updatePagination"></pagination-drop-down>
+        <div class="tl_submit_panel tl_subpanel" style="grid-template-columns:repeat(1,1fr)">
+            <button name="filter_reset" id="filter_reset" value="1" class="tl_submit filter_reset" @click="resetFilters" :disabled="!resetFiltersActive">{{ labels.reset }}</button>
         </div>
     </div>
 </template>
@@ -61,27 +73,23 @@
                 let filters = {};
 
                 this.filterDefinition.forEach((filterDef) => {
-                  filters[filterDef.propertyName] = [];
-
-                  // Add label and reset options first
-                   filters[filterDef.propertyName].push({
+                   filters[filterDef.propertyName] = {
                        label: filterDef.label,
-                       value: ''
-                   });
-                   filters[filterDef.propertyName].push({
-                       label: '---',
-                       value: ''
-                   });
-
-                   filterDef.options.forEach((option) => {
-                       filters[filterDef.propertyName].push(option)
-                   });
+                       options: [
+                           { value: '', label: '-' },
+                           ...filterDef.options,
+                       ],
+                   };
 
                    // Set default selected option
                    this.filterData[filterDef.propertyName] = '';
                 });
 
                 return filters;
+            },
+
+            resetFiltersActive() {
+                return this.isAtLeastOneFilterOrKeywordsActive();
             }
         },
 
@@ -126,6 +134,15 @@
                     this.filterData[property] = '';
                 });
                 this.keywords = '';
+
+                // Refresh the Choices.js – as silly as it is, but there is no way to access the Choices instance
+                this.$refs.filterPanel.querySelectorAll('select').forEach(el => {
+                    const item = el.parentElement.querySelector('.choices__item');
+
+                    if (item) {
+                        item.textContent = '-';
+                    }
+                });
 
                 this.$emit('reset');
             },
