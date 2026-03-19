@@ -78,6 +78,10 @@ abstract class AbstractMetadataUpdater implements ServiceSubscriberInterface
      * Examples:
      *  - locale "de" => "de" first, then "de+"
      *  - locale "de_CH" => "de_CH" first, then "de+"
+     *
+     * @param array<string, mixed> $metaConfig
+     *
+     * @return array<string, mixed>
      */
     private function resolveMetaConfigForLocale(string $locale, array $metaConfig): array
     {

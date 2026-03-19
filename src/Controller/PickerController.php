@@ -6,6 +6,7 @@ namespace Terminal42\ContaoDamIntegrator\Controller;
 
 use Contao\Backend;
 use Contao\BackendTemplate;
+use Contao\BackendUser;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Picker\PickerBuilderInterface;
@@ -25,6 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\ContaoDamIntegrator\Integration\IntegrationInterface;
 use Terminal42\ContaoDamIntegrator\IntegrationCollection;
+use Twig\Environment as TwigEnvironment;
 
 #[Route(defaults: ['_scope' => 'backend'])]
 class PickerController
@@ -37,6 +39,8 @@ class PickerController
         private readonly TranslatorInterface $translator,
         private readonly RouterInterface $router,
         private readonly IntegrationCollection $integrationCollection,
+        private readonly TwigEnvironment $twig,
+        private readonly bool $isDebug,
     ) {
     }
 
@@ -75,11 +79,17 @@ class PickerController
             $template->pickerMenu = $this->menuRenderer->render($picker->getMenu());
         }
 
+        $renderMainOnly = $request->query->has('popup') || 'contao-main' === $request->headers->get('turbo-frame');
+
         $template->attributes = ' data-dam-asset-picker="'.$integration::getKey().'"';
         $template->main = $this->getInitHtml($picker, $integration);
         $template->title = StringUtil::specialchars($integration->getPickerLabel());
         $template->headline = StringUtil::specialchars($integration->getPickerLabel());
         $template->isPopup = true;
+        $template->isDebug = $this->isDebug;
+        $template->backendWidth = BackendUser::getInstance()->backendWidth;
+        $template->host = Backend::getDecodedHostname();
+        $template->renderMainOnly = $renderMainOnly;
         $template->theme = Backend::getTheme();
         $template->base = Environment::get('base');
         $template->language = $GLOBALS['TL_LANGUAGE'];
@@ -94,42 +104,35 @@ class PickerController
     {
         $config = $picker->getConfig();
 
-        $fieldType = $config->getExtra('fieldType');
-        $preSelected = json_encode(explode(',', $config->getValue()));
-
-        $labels = json_encode((object) [
-            'reset' => $this->translator->trans('MSC.reset', [], 'contao_default'),
-            'apply' => $this->translator->trans('MSC.apply', [], 'contao_default'),
-            'filter' => $this->translator->trans('MSC.filter', [], 'contao_default'),
-            'search' => $this->translator->trans('MSC.search', [], 'contao_default'),
-            'keywords' => $this->translator->trans('MSC.keywords', [], 'contao_default'),
-            'loadingData' => $this->translator->trans('MSC.loadingData', [], 'contao_default'),
-            'noResult' => $this->translator->trans('MSC.noResult', [], 'contao_default'),
-            'showOnly' => $this->translator->trans('MSC.showOnly', [], 'contao_default'),
-            'downloadFailed' => $this->translator->trans('MSC.damDownloadFailed', [], 'contao_default'),
-            'pickerLabel' => $integration->getPickerLabel(),
+        return $this->twig->render('@Contao/backend/dam_picker.html.twig', [
+            'js_config' => [
+                'fieldType' => $config->getExtra('fieldType'),
+                'pickerConfig' => $config->urlEncode(),
+                'preSelected' => explode(',', $config->getValue()),
+                'api' => [
+                    'filters' => $this->router->generate('dam_integrator_api_filters', ['integration' => $integration::getKey()], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'assets' => $this->router->generate('dam_integrator_api_assets', ['integration' => $integration::getKey()], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'download' => $this->router->generate('dam_integrator_api_download', ['integration' => $integration::getKey()], UrlGeneratorInterface::ABSOLUTE_URL),
+                ],
+                'labels' => [
+                    'reset' => $this->translator->trans('MSC.reset', [], 'contao_default'),
+                    'apply' => $this->translator->trans('MSC.apply', [], 'contao_default'),
+                    'filter' => $this->translator->trans('MSC.filter', [], 'contao_default'),
+                    'toggleFilter' => $this->translator->trans('DCA.toggleFilter.0', [], 'contao_default'),
+                    'toggleFilterShow' => $this->translator->trans('DCA.toggleFilter.1', [], 'contao_default'),
+                    'toggleFilterHide' => $this->translator->trans('DCA.toggleFilter.2', [], 'contao_default'),
+                    'field' => $this->translator->trans('MSC.field', [], 'contao_default'),
+                    'search' => $this->translator->trans('MSC.search', [], 'contao_default'),
+                    'keyword' => $this->translator->trans('MSC.keyword', [], 'contao_default'),
+                    'keywords' => $this->translator->trans('MSC.keywords', [], 'contao_default'),
+                    'loadingData' => $this->translator->trans('MSC.loadingData', [], 'contao_default'),
+                    'noResult' => $this->translator->trans('MSC.noResult', [], 'contao_default'),
+                    'showOnly' => $this->translator->trans('MSC.showOnly', [], 'contao_default'),
+                    'download' => $this->translator->trans('MSC.download', [], 'contao_default'),
+                    'downloadFailed' => $this->translator->trans('MSC.damDownloadFailed', [], 'contao_default'),
+                    'pickerLabel' => $integration->getPickerLabel(),
+                ],
+            ],
         ]);
-
-        $filtersApi = $this->router->generate('dam_integrator_api_filters', ['integration' => $integration::getKey()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $assetsApi = $this->router->generate('dam_integrator_api_assets', ['integration' => $integration::getKey()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $downloadApi = $this->router->generate('dam_integrator_api_download', ['integration' => $integration::getKey()], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        return <<<VIEW
-            <div class="tl_tree_radio"></div>
-            <div id="dam_interface"></div>
-            <script>
-            window.initDamInterface('#dam_interface', {
-                fieldType: '$fieldType',
-                labels: $labels,
-                preSelected: $preSelected,
-                pickerConfig: '{$config->urlEncode()}',
-                api: {
-                    filters: '$filtersApi',
-                    assets: '$assetsApi',
-                    download: '$downloadApi'
-                }
-            });
-            </script>
-            VIEW;
     }
 }

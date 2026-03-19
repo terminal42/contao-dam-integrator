@@ -121,11 +121,11 @@ class BynderMetadataUpdater extends AbstractMetadataUpdater
         $singleSelectProperties = [];
 
         foreach ($media as $property => $value) {
-            if (!str_starts_with($property, 'property_')) {
+            if (!str_starts_with((string) $property, 'property_')) {
                 continue;
             }
 
-            $propertyName = substr($property, 9);
+            $propertyName = substr((string) $property, 9);
 
             if (!isset($metaProperties[$propertyName]) || !\is_array($value)) {
                 continue;

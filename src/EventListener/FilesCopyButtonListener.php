@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Terminal42\ContaoDamIntegrator\EventListener;
 
+use Contao\CoreBundle\DataContainer\DataContainerOperation;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\FilesModel;
 
@@ -12,24 +13,19 @@ class FilesCopyButtonListener
 {
     /**
      * Disable copying DAM assets.
-     *
-     * @param array<string, mixed> $row
      */
-    public function __invoke(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
+    public function __invoke(DataContainerOperation $operation): void
     {
-        $originalCallback = new \tl_files();
-        $original = $originalCallback->copyFile($row, $href, $label, $title, $icon, $attributes);
+        if (($record = $operation->getRecord()) === null) {
+            return;
+        }
 
-        $model = FilesModel::findByPath($row['id']);
-
-        if (null === $model) {
-            return $original;
+        if (($model = FilesModel::findByPath($record['id'])) === null) {
+            return;
         }
 
         if (null !== $model->dam_asset_hash) {
-            return '';
+            $operation->hide();
         }
-
-        return $original;
     }
 }

@@ -25,6 +25,9 @@ use Terminal42\ContaoDamIntegrator\Integration\IntegrationInterface;
 
 class Terminal42ContaoDamIntegratorExtension extends Extension
 {
+    /**
+     * @param array<array<string, mixed>> $configs
+     */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);

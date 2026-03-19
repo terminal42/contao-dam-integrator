@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Terminal42\ContaoDamIntegrator\Migration\UpgradeFromContaoBynderDbafsMigration;
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+use Terminal42\ContaoDamIntegrator\Migration\UpgradeFromContaoBynderDbafsMigration;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();

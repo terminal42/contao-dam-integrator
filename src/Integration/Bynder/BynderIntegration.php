@@ -167,6 +167,7 @@ class BynderIntegration extends AbstractIntegration
             }
 
             /** @var StreamableInterface $response */
+            // @phpstan-ignore-next-line varTag.nativeType
             $response = $this->httpClient->request('GET', $fileUrl);
             $stream = $response->toStream();
         } catch (ExceptionInterface $e) {

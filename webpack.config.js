@@ -1,5 +1,4 @@
 const { Encore } = require('@terminal42/contao-build-tools');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = Encore()
     .setOutputPath('public')
@@ -7,6 +6,6 @@ module.exports = Encore()
     .enableVueLoader(() => {}, {
         runtimeCompilerBuild: false
     })
-    .addEntry('app', './view/js/app.js')
+    .addEntry('app', './assets/js/app.js')
     .getWebpackConfig()
 ;

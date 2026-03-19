@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use Terminal42\ContaoDamIntegrator\AssetHandler;
 use Terminal42\ContaoDamIntegrator\Command\UpdateMetadataCommand;
 use Terminal42\ContaoDamIntegrator\Controller\ApiController;
@@ -14,9 +15,6 @@ use Terminal42\ContaoDamIntegrator\Integration\IntegrationInterface;
 use Terminal42\ContaoDamIntegrator\IntegrationCollection;
 use Terminal42\ContaoDamIntegrator\Messenger\MessageHandler\UpdateMetadataMessageHandler;
 use Terminal42\ContaoDamIntegrator\Picker\AbstractPickerProvider;
-
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
@@ -41,7 +39,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             service('knp_menu.factory'),
             service('router'),
-            service('security.token_storage'),
             service('assets.packages'),
         ])
         ->autoconfigure(false)
@@ -56,6 +53,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             service('translator'),
             service('router'),
             service(IntegrationCollection::class),
+            service('twig'),
+            param('kernel.debug'),
         ])
         ->public()
     ;
