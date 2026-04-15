@@ -60,6 +60,8 @@ abstract class AbstractIntegration implements IntegrationInterface, ServiceSubsc
             $extension = Path::getExtension($name);
             if ('' === $extension) {
                 $extension = 'unknown';
+            } else {
+                $name = mb_substr($name, 0, -(mb_strlen($extension) + 1));
             }
         }
 
