@@ -2,10 +2,10 @@
   "entrypoints": {
     "app": {
       "css": [
-        "/bundles/terminal42contaodamintegrator/app.bb094ca7.css"
+        "/bundles/terminal42contaodamintegrator/app.dcdfa263.css"
       ],
       "js": [
-        "/bundles/terminal42contaodamintegrator/app.880b165f.js"
+        "/bundles/terminal42contaodamintegrator/app.81d30110.js"
       ]
     }
   }

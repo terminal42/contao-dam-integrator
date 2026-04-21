@@ -16,7 +16,7 @@
                     @paginationUpdated="paginationUpdated">
             </filter-panel>
             <div class="content-inner">
-                <div class="operations" id="tl_buttons">
+                <div class="operations" id="tl_buttons" v-if="!loading">
                     <ul>
                         <li style="display: none;">
                             <button class="header_filter_toggle" :title="labels.toggleFilterShow" data-controller="contao--toggle-sender" data-contao--toggle-sender-contao--toggle-receiver-outlet="#tl_content_filter" :data-contao--toggle-sender-active-title-value="labels.toggleFilterHide" :data-contao--toggle-sender-inactive-title-value="labels.toggleFilterShow" data-action="contao--toggle-sender#toggle:prevent">{{ labels.toggleFilter }}</button>
@@ -25,7 +25,11 @@
                 </div>
 
                 <div class="tl_listing_container tree_view tl_file_manager" id="tl_listing" :data-picker-value="fieldType === 'checkbox' ? JSON.stringify(preSelected) : ''">
-                    <div v-if="loading" class="loader">{{ labels.loadingData }}</div>
+                    <div v-if="loading" class="loader">
+                        <img src="/system/themes/flexible/icons/loading.svg" width="30" height="30" alt="" class="color-scheme--light">
+                        <img src="/system/themes/flexible/icons/loading--dark.svg" width="30" height="30" alt="" class="color-scheme--dark">
+                        <span class="loader-text">{{ labels.loadingData }} …</span>
+                    </div>
                     <div v-else-if="!hasAssets()">{{ labels.noResult }}</div>
                     <ul v-else class="tl_listing picker unselectable" id="tl_select">
                         <li class="tl_folder_top cf"><div class="tl_left">{{ labels.pickerLabel }}</div></li>
