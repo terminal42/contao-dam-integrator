@@ -16,7 +16,7 @@
                     @paginationUpdated="paginationUpdated">
             </filter-panel>
             <div class="content-inner">
-                <div class="operations" id="tl_buttons" v-if="!loading">
+                <div class="operations" id="tl_buttons" :style="{ display: loading ? 'none' : 'block' }">
                     <ul>
                         <li style="display: none;">
                             <button class="header_filter_toggle" :title="labels.toggleFilterShow" data-controller="contao--toggle-sender" data-contao--toggle-sender-contao--toggle-receiver-outlet="#tl_content_filter" :data-contao--toggle-sender-active-title-value="labels.toggleFilterHide" :data-contao--toggle-sender-inactive-title-value="labels.toggleFilterShow" data-action="contao--toggle-sender#toggle:prevent">{{ labels.toggleFilter }}</button>
