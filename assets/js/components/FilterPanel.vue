@@ -29,7 +29,7 @@
                     </template>
                 </fieldset>
             </div>
-            <div class="tl_panel">
+            <div class="tl_panel" v-if="pagination.totalPages > 0">
                 <pagination-drop-down :data="pagination" :labels="labels" @apply="updatePagination"></pagination-drop-down>
             </div>
         </div>
@@ -145,6 +145,7 @@ export default {
 
         updatePagination(page) {
             this.$emit('paginationUpdated', page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         },
     },
 };
