@@ -108,7 +108,6 @@ class BynderIntegration extends AbstractIntegration
             'metaproperties',
             [
                 'query' => [
-                    'count' => 1,
                     'type' => implode(',', $this->extractBynderMediaTypeFromAllowedExtensions($pickerConfig)),
                 ],
             ],
@@ -117,17 +116,36 @@ class BynderIntegration extends AbstractIntegration
         // Sort by z-index
         uasort($metaProperties, static fn (array $a, array $b) => $a['zindex'] <=> $b['zindex']);
 
+        $filterProperties = $this->httpClient->request(
+            'GET',
+            'media',
+            [
+                'query' => [
+                    'limit' => 1,
+                    'count' => 1,
+                    'type' => implode(',', $this->extractBynderMediaTypeFromAllowedExtensions($pickerConfig)),
+                ],
+            ],
+        )->toArray();
+
         foreach ($metaProperties as $propertyName => $metaProperty) {
             // Currently, only single selects are supported.
             if (!isset($metaProperty['type']) || !\in_array($metaProperty['type'], ['select', 'select2'], true)) {
                 continue;
             }
 
+            // If no result for that property at all - skip it entirely
+            if (!isset($filterProperties['count']['property_'.$propertyName])) {
+                continue;
+            }
+
+            $optionsWithMedia = array_keys($filterProperties['count']['property_'.$propertyName]);
+
             $filter = new Filter($propertyName, $metaProperty['label']);
 
             foreach ($metaProperty['options'] as $option) {
                 // No need to show empty filter options
-                if (0 === $option['mediaCount']) {
+                if (!\in_array($option['name'], $optionsWithMedia, true)) {
                     continue;
                 }
 
