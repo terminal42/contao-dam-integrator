@@ -11,9 +11,8 @@ use Terminal42\ContaoDamIntegrator\Integration\Bynder\BynderIntegration;
 
 class UpgradeFromContaoBynderDbafsMigration extends AbstractMigration
 {
-    public function __construct(
-        private readonly Connection $connection,
-    ) {
+    public function __construct(private readonly Connection $connection)
+    {
     }
 
     public function shouldRun(): bool
