@@ -8,6 +8,7 @@ use Contao\CoreBundle\Filesystem\Dbafs\StoreDbafsMetadataEvent;
 use Contao\CoreBundle\Picker\PickerConfig;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpClient\Response\StreamableInterface;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Terminal42\ContaoDamIntegrator\Integration\AbstractIntegration;
@@ -225,8 +226,12 @@ class BynderIntegration extends AbstractIntegration
     {
         try {
             $media = $this->httpClient->request('GET', \sprintf('media/%s', $identifier))->toArray();
-        } catch (ExceptionInterface $e) {
-            $this->logError(\sprintf('Could not download asset ID "%s"', $identifier), $e);
+        } catch (ClientExceptionInterface $e) {
+            if (404 !== $e->getResponse()->getStatusCode()) {
+                throw $e;
+            }
+
+            $this->logger()->warning(\sprintf('Bynder asset ID "%s" is unavailable (HTTP 404). Skipping this asset and preserving existing metadata.', $identifier), ['exception' => $e]);
 
             return null;
         }
